@@ -73,6 +73,7 @@ fn spawn_character(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 | bevy        | bevy_wind_waker_shader |
 |-------------|------------------------|
+| 0.18        | 0.6                    |
 | 0.17        | 0.5                    |
 | 0.16        | 0.4                    |
 | 0.15        | 0.3                    |
