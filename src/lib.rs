@@ -3,8 +3,10 @@
 #![doc = include_str!("../readme.md")]
 
 pub mod prelude {
-    //! Everything you need to get started with the Wind Waker shader. For the main feature, see [WindWakerShaderBuilder].
+    //! Everything you need to get started. See [`WindWakerShaderBuilder`] for Wind Waker style
+    //! and [`FlatShaderPlugin`] / [`FlatShaderBuilder`] for flat Sable-style shading.
     pub use crate::{
+        flat::{FlatExtendedMaterial, FlatShader, FlatShaderBuilder, FlatShaderPlugin},
         TimeOfDay, Weather, WindWakerShader, WindWakerShaderBuilder, WindWakerShaderPlugin,
     };
 }
@@ -13,6 +15,8 @@ pub use components::{
     ExtendedMaterial, TimeOfDay, Weather, WindWakerShader, WindWakerShaderBuilder,
 };
 pub use plugin::WindWakerShaderPlugin;
+
+pub mod flat;
 
 mod components;
 mod plugin;
