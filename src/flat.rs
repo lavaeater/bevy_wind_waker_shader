@@ -115,9 +115,9 @@ pub struct FlatShaderBuilder {
 impl Default for FlatShaderBuilder {
     fn default() -> Self {
         Self {
-            shadow_tint: Color::srgb(0.9, 0.9, 0.9),
+            shadow_tint: Color::srgb(0.5, 0.5, 0.5),
             highlight_tint: Color::WHITE,
-            color_levels: 6.0,
+            color_levels: 12.0,
         }
     }
 }
