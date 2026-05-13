@@ -70,6 +70,12 @@ pub struct FlatShader {
     /// Tint multiplied onto lit areas. Default: white (no change).
     #[uniform(103)]
     pub highlight_tint: LinearRgba,
+    /// Number of discrete color levels per channel for palette quantization.
+    ///
+    /// `0.0` disables posterization (continuous color). `6.0` gives a 216-color palette
+    /// reminiscent of Sable's art style. Higher values (e.g. `16.0`) are subtler.
+    #[uniform(104)]
+    pub color_levels: f32,
 }
 
 impl Default for FlatShader {
@@ -103,13 +109,15 @@ impl MaterialExtension for FlatShader {
 pub struct FlatShaderBuilder {
     shadow_tint: Color,
     highlight_tint: Color,
+    color_levels: f32,
 }
 
 impl Default for FlatShaderBuilder {
     fn default() -> Self {
         Self {
-            shadow_tint: Color::srgb(0.8, 0.8, 0.8),
-            highlight_tint: Color::srgb(0.5, 0.5, 0.5),
+            shadow_tint: Color::srgb(0.9, 0.9, 0.9),
+            highlight_tint: Color::WHITE,
+            color_levels: 6.0,
         }
     }
 }
@@ -135,12 +143,22 @@ impl FlatShaderBuilder {
         self
     }
 
+    /// Sets the number of discrete color levels per RGB channel used for palette quantization.
+    ///
+    /// `0.0` disables posterization. `6.0` (default) gives a 216-color palette. Higher values
+    /// are subtler; lower values give a more extreme poster-art look.
+    pub fn color_levels(mut self, levels: f32) -> Self {
+        self.color_levels = levels;
+        self
+    }
+
     /// Builds the [`FlatShader`].
     pub fn build(self) -> FlatShader {
         FlatShader {
             mask: TEXTURE_HANDLE.clone(),
             shadow_tint: self.shadow_tint.into(),
             highlight_tint: self.highlight_tint.into(),
+            color_levels: self.color_levels,
         }
     }
 }
@@ -288,7 +306,6 @@ fn apply_globally_on_material_add(
     mut cmds: Commands,
 ) {
     if without_shader.contains(trigger.event_target()) {
-        info!("Found one");
         cmds.entity(trigger.event_target()).insert(global.0.clone());
     }
 }

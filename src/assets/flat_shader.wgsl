@@ -21,6 +21,9 @@
 @group(3) @binding(102) var<uniform> shadow_tint: vec4<f32>;
 /// Multiplier applied to lit areas (white = preserve original color).
 @group(3) @binding(103) var<uniform> highlight_tint: vec4<f32>;
+/// Number of discrete color levels per channel for palette quantization.
+/// 0.0 = disabled (continuous color), 6.0 = 216-color palette, 8.0 = 512-color palette, etc.
+@group(3) @binding(104) var<uniform> color_levels: f32;
 
 @fragment
 fn fragment(
@@ -48,6 +51,15 @@ fn fragment(
     // rather than replacing it, so model colors are fully preserved.
     let tint = mix(shadow_tint, highlight_tint, quantization);
     out.color = texture * tint;
+
+    // Palette quantization: posterize each RGB channel to `color_levels` discrete steps.
+    // This maps the continuous color space to a limited palette, giving a Sable-like look.
+    if color_levels > 0.0 {
+        out.color = vec4<f32>(
+            round(out.color.rgb * color_levels) / color_levels,
+            out.color.a,
+        );
+    }
 
     pbr_input.material.base_color = texture;
     out.color = main_pass_post_lighting_processing(pbr_input, out.color);

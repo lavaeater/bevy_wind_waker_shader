@@ -17,3 +17,6 @@ features = ["png", "bevy_asset", "bevy_pbr", "bevy_gltf"]
 
 [dev-dependencies.bevy]
 version = "0.18.0"
+
+[dev-dependencies.bevy_mod_outline]
+version = "0.12"

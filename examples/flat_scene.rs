@@ -1,24 +1,37 @@
-/// Demonstrates the flat (Sable-style) toon shader applied game-wide via
-/// [`FlatShaderPlugin::global`], so no per-entity shader setup is needed.
+/// Demonstrates the flat (Sable-style) toon shader with game-wide automatic application
+/// and fat black outlines via `bevy_mod_outline`.
 ///
 /// Run with:
 ///   cargo run --example flat_scene
 use bevy::anti_alias::fxaa::Fxaa;
 use bevy::prelude::*;
+use bevy_mod_outline::{AsyncSceneInheritOutline, AutoGenerateOutlineNormalsPlugin, OutlinePlugin, OutlineVolume};
 use bevy_wind_waker_shader::prelude::*;
 
 fn main() {
     App::new()
-        // global() automatically shades every StandardMaterial mesh in the app,
-        // including all children of loaded scenes.
-        .add_plugins((DefaultPlugins, FlatShaderPlugin::global()))
+        // FlatShaderPlugin::global() automatically shades every StandardMaterial
+        // mesh in the app, including all children of loaded scenes.
+        .add_plugins((
+            DefaultPlugins,
+            FlatShaderPlugin::global(),
+            OutlinePlugin,
+            AutoGenerateOutlineNormalsPlugin::default(),
+        ))
         .add_systems(Startup, setup)
         .add_systems(Update, rotate_light)
         .run();
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // No per-entity shader component needed — the plugin handles everything.
+    let outline = OutlineVolume {
+        visible: true,
+        width: 4.0,
+        colour: Color::BLACK,
+    };
+
+    // No per-entity shader component needed — FlatShaderPlugin::global() handles shading.
+    // AsyncSceneInheritOutline propagates OutlineVolume to all scene children automatically.
     commands.spawn((
         SceneRoot(asset_server.load("FlightHelmet/FlightHelmet.gltf#Scene0")),
         Transform {
@@ -26,6 +39,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             scale: Vec3::splat(4.0),
             ..default()
         },
+        outline.clone(),
+        AsyncSceneInheritOutline::default(),
     ));
     commands.spawn((
         SceneRoot(asset_server.load("Fox.glb#Scene0")),
@@ -35,6 +50,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         }
         .looking_at(Vec3::new(2.0, -2.5, -5.0), Vec3::Y),
+        outline,
+        AsyncSceneInheritOutline::default(),
     ));
 
     // light
