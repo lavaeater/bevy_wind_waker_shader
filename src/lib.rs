@@ -3,10 +3,12 @@
 #![doc = include_str!("../readme.md")]
 
 pub mod prelude {
-    //! Everything you need to get started. See [`WindWakerShaderBuilder`] for Wind Waker style
-    //! and [`FlatShaderPlugin`] / [`FlatShaderBuilder`] for flat Sable-style shading.
+    //! Everything you need to get started. See [`WindWakerShaderBuilder`] for Wind Waker style,
+    //! [`FlatShaderPlugin`] / [`FlatShaderBuilder`] for flat Sable-style shading, and
+    //! [`PixelShaderPlugin`] / [`PixelShaderBuilder`] for pixelation.
     pub use crate::{
         flat::{FlatExtendedMaterial, FlatShader, FlatShaderBuilder, FlatShaderPlugin},
+        pixelate::{PixelExtendedMaterial, PixelShader, PixelShaderBuilder, PixelShaderPlugin},
         TimeOfDay, Weather, WindWakerShader, WindWakerShaderBuilder, WindWakerShaderPlugin,
     };
 }
@@ -17,6 +19,7 @@ pub use components::{
 pub use plugin::WindWakerShaderPlugin;
 
 pub mod flat;
+pub mod pixelate;
 
 mod components;
 mod plugin;
