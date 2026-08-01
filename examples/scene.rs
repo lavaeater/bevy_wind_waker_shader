@@ -13,7 +13,7 @@ fn main() {
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // objects
     commands.spawn((
-        SceneRoot(asset_server.load("FlightHelmet/FlightHelmet.gltf#Scene0")),
+        WorldAssetRoot(asset_server.load("FlightHelmet/FlightHelmet.gltf#Scene0")),
         Transform {
             translation: Vec3::new(-1.5, -1.0, 0.0),
             scale: Vec3::splat(4.0),
@@ -25,7 +25,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             .build(),
     ));
     commands.spawn((
-        SceneRoot(asset_server.load("Fox.glb#Scene0")),
+        WorldAssetRoot(asset_server.load("Fox.glb#Scene0")),
         Transform {
             translation: Vec3::new(1.5, -1.0, 0.0),
             scale: Vec3::splat(0.03),

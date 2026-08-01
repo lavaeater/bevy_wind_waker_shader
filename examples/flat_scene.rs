@@ -5,7 +5,7 @@
 ///   cargo run --example flat_scene
 use bevy::anti_alias::fxaa::Fxaa;
 use bevy::prelude::*;
-use bevy_mod_outline::{AsyncSceneInheritOutline, AutoGenerateOutlineNormalsPlugin, OutlinePlugin, OutlineVolume};
+use bevy_mod_outline::{AsyncWorldInheritOutline, AutoGenerateOutlineNormalsPlugin, OutlinePlugin, OutlineVolume};
 use bevy_wind_waker_shader::prelude::*;
 
 fn main() {
@@ -15,7 +15,7 @@ fn main() {
         .add_plugins((
             DefaultPlugins,
             FlatShaderPlugin::global(),
-            OutlinePlugin,
+            OutlinePlugin::EXTRUDE_VERTEX,
             AutoGenerateOutlineNormalsPlugin::default(),
         ))
         .add_systems(Startup, setup)
@@ -31,19 +31,19 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     };
 
     // No per-entity shader component needed — FlatShaderPlugin::global() handles shading.
-    // AsyncSceneInheritOutline propagates OutlineVolume to all scene children automatically.
+    // AsyncWorldInheritOutline propagates OutlineVolume to all scene children automatically.
     commands.spawn((
-        SceneRoot(asset_server.load("FlightHelmet/FlightHelmet.gltf#Scene0")),
+        WorldAssetRoot(asset_server.load("FlightHelmet/FlightHelmet.gltf#Scene0")),
         Transform {
             translation: Vec3::new(-1.5, -1.0, 0.0),
             scale: Vec3::splat(4.0),
             ..default()
         },
         outline.clone(),
-        AsyncSceneInheritOutline::default(),
+        AsyncWorldInheritOutline::default(),
     ));
     commands.spawn((
-        SceneRoot(asset_server.load("Fox.glb#Scene0")),
+        WorldAssetRoot(asset_server.load("Fox.glb#Scene0")),
         Transform {
             translation: Vec3::new(1.5, -1.0, 0.0),
             scale: Vec3::splat(0.03),
@@ -51,7 +51,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         }
         .looking_at(Vec3::new(2.0, -2.5, -5.0), Vec3::Y),
         outline,
-        AsyncSceneInheritOutline::default(),
+        AsyncWorldInheritOutline::default(),
     ));
 
     // light

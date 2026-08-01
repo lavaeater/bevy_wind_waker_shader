@@ -11,7 +11,7 @@
 //!
 //! fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
 //!     commands.spawn((
-//!         SceneRoot(asset_server.load("models/Fox.glb")),
+//!         WorldAssetRoot(asset_server.load("models/Fox.glb")),
 //!         PixelShaderBuilder::default().build(),
 //!     ));
 //! }
@@ -23,7 +23,7 @@ use bevy::pbr::{
 };
 use bevy::prelude::*;
 use bevy::render::render_resource::AsBindGroup;
-use bevy::scene::{SceneInstance, SceneRoot};
+use bevy::world_serialization::{WorldInstance, WorldAssetRoot};
 use bevy::shader::ShaderRef;
 
 pub(crate) const PIXELATE_SHADER_HANDLE: Handle<Shader> =
@@ -35,7 +35,7 @@ pub type PixelExtendedMaterial = ExtendedMaterial<StandardMaterial, PixelShader>
 /// A pixelation shader that makes models appear rendered at a lower resolution.
 ///
 /// Insert this component (via [`PixelShaderBuilder`]) on a mesh entity or a
-/// [`SceneRoot`]. The plugin replaces the [`StandardMaterial`] with an
+/// [`WorldAssetRoot`]. The plugin replaces the [`StandardMaterial`] with an
 /// [`ExtendedMaterial`] and removes this component once done.
 #[derive(Asset, AsBindGroup, PartialEq, Debug, Clone, Component, Reflect)]
 #[reflect(PartialEq)]
@@ -126,7 +126,7 @@ impl PixelShaderBuilder {
 /// Plugin for the pixelation shader.
 ///
 /// Add this plugin once, then insert [`PixelShader`] (via [`PixelShaderBuilder`])
-/// on any entity with a [`SceneRoot`] or a bare mesh to make it appear pixelated.
+/// on any entity with a [`WorldAssetRoot`] or a bare mesh to make it appear pixelated.
 #[non_exhaustive]
 #[derive(Debug, Default, Clone)]
 pub struct PixelShaderPlugin;
@@ -154,10 +154,10 @@ impl Plugin for PixelShaderPlugin {
 // ---------------------------------------------------------------------------
 
 fn customize_scene_materials(
-    unloaded_instances: Query<(Entity, Option<&SceneInstance>, &PixelShader), With<SceneRoot>>,
+    unloaded_instances: Query<(Entity, Option<&WorldInstance>, &PixelShader), With<WorldAssetRoot>>,
     handles: Query<(Entity, &MeshMaterial3d<StandardMaterial>)>,
     pbr_materials: Res<Assets<StandardMaterial>>,
-    scene_manager: Res<SceneSpawner>,
+    scene_manager: Res<WorldInstanceSpawner>,
     mut materials: ResMut<Assets<PixelExtendedMaterial>>,
     mut cmds: Commands,
 ) {
@@ -185,7 +185,7 @@ fn customize_scene_materials(
 fn customize_standard_materials(
     with_material: Query<
         (Entity, &MeshMaterial3d<StandardMaterial>, &PixelShader),
-        Without<SceneRoot>,
+        Without<WorldAssetRoot>,
     >,
     mut materials: ResMut<Assets<PixelExtendedMaterial>>,
     pbr_materials: Res<Assets<StandardMaterial>>,

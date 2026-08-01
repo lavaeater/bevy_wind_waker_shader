@@ -1,15 +1,15 @@
 use crate::WindWakerShader;
 use bevy::asset::Assets;
 use bevy::pbr::{ExtendedMaterial, MeshMaterial3d, StandardMaterial};
-use bevy::prelude::{Commands, Entity, Query, Res, ResMut, SceneSpawner, With, Without};
-use bevy::scene::{SceneInstance, SceneRoot};
+use bevy::prelude::{Commands, Entity, Query, Res, ResMut, WorldInstanceSpawner, With, Without};
+use bevy::world_serialization::{WorldInstance, WorldAssetRoot};
 
 /// Source: https://github.com/bevyengine/bevy/discussions/8533#discussioncomment-5787519
 pub(crate) fn customize_scene_materials(
-    unloaded_instances: Query<(Entity, Option<&SceneInstance>, &WindWakerShader), With<SceneRoot>>,
+    unloaded_instances: Query<(Entity, Option<&WorldInstance>, &WindWakerShader), With<WorldAssetRoot>>,
     handles: Query<(Entity, &MeshMaterial3d<StandardMaterial>)>,
     pbr_materials: Res<Assets<StandardMaterial>>,
-    scene_manager: Res<SceneSpawner>,
+    scene_manager: Res<WorldInstanceSpawner>,
     mut materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, WindWakerShader>>>,
     mut cmds: Commands,
 ) {
@@ -39,7 +39,7 @@ pub(crate) fn customize_scene_materials(
 pub(crate) fn customize_standard_materials(
     with_material: Query<
         (Entity, &MeshMaterial3d<StandardMaterial>, &WindWakerShader),
-        Without<SceneRoot>,
+        Without<WorldAssetRoot>,
     >,
     mut materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, WindWakerShader>>>,
     pbr_materials: Res<Assets<StandardMaterial>>,

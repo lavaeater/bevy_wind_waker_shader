@@ -26,7 +26,7 @@
 //!
 //! fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
 //!     commands.spawn((
-//!         SceneRoot(asset_server.load("models/Fox.glb")),
+//!         WorldAssetRoot(asset_server.load("models/Fox.glb")),
 //!         FlatShaderBuilder::default().shadow_darkness(0.6).build(),
 //!     ));
 //! }
@@ -40,7 +40,7 @@ use bevy::pbr::{
 };
 use bevy::prelude::*;
 use bevy::render::render_resource::AsBindGroup;
-use bevy::scene::{SceneInstance, SceneRoot};
+use bevy::world_serialization::{WorldInstance, WorldAssetRoot};
 use bevy::shader::ShaderRef;
 
 use crate::components::TEXTURE_HANDLE;
@@ -54,7 +54,7 @@ pub type FlatExtendedMaterial = ExtendedMaterial<StandardMaterial, FlatShader>;
 /// A flat toon shader that preserves the mesh's original texture colors.
 ///
 /// Insert this component (via [`FlatShaderBuilder`]) on a mesh entity or a
-/// [`SceneRoot`]. The plugin will replace the [`StandardMaterial`] with an
+/// [`WorldAssetRoot`]. The plugin will replace the [`StandardMaterial`] with an
 /// [`ExtendedMaterial`] and remove this component once done.
 ///
 /// For game-wide application see [`FlatShaderPlugin::global`].
@@ -245,10 +245,10 @@ impl Plugin for FlatShaderPlugin {
 // ---------------------------------------------------------------------------
 
 fn customize_scene_materials(
-    unloaded_instances: Query<(Entity, Option<&SceneInstance>, &FlatShader), With<SceneRoot>>,
+    unloaded_instances: Query<(Entity, Option<&WorldInstance>, &FlatShader), With<WorldAssetRoot>>,
     handles: Query<(Entity, &MeshMaterial3d<StandardMaterial>)>,
     pbr_materials: Res<Assets<StandardMaterial>>,
-    scene_manager: Res<SceneSpawner>,
+    scene_manager: Res<WorldInstanceSpawner>,
     mut materials: ResMut<Assets<FlatExtendedMaterial>>,
     mut cmds: Commands,
 ) {
@@ -276,7 +276,7 @@ fn customize_scene_materials(
 fn customize_standard_materials(
     with_material: Query<
         (Entity, &MeshMaterial3d<StandardMaterial>, &FlatShader),
-        Without<SceneRoot>,
+        Without<WorldAssetRoot>,
     >,
     mut materials: ResMut<Assets<FlatExtendedMaterial>>,
     pbr_materials: Res<Assets<StandardMaterial>>,
