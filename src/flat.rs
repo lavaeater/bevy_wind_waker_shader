@@ -117,7 +117,7 @@ impl Default for FlatShaderBuilder {
         Self {
             shadow_tint: Color::srgb(0.5, 0.5, 0.5),
             highlight_tint: Color::WHITE,
-            color_levels: 12.0,
+            color_levels: 4.0,
         }
     }
 }
