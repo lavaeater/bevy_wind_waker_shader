@@ -87,6 +87,7 @@ impl WindWakerShaderBuilder {
     /// Note that the [weather](WindWakerShaderBuilder::weather) will modify the colors.
     ///
     /// The default time of day is [TimeOfDay::Day].
+    #[must_use]
     pub const fn time_of_day(mut self, time: TimeOfDay) -> Self {
         self.time_of_day = time;
         self
@@ -95,6 +96,7 @@ impl WindWakerShaderBuilder {
     /// Modifies the color palette associated with the [time of day](WindWakerShaderBuilder::time_of_day) by the given weather.
     ///
     /// The default weather is [Weather::Sunny].
+    #[must_use]
     pub const fn weather(mut self, weather: Weather) -> Self {
         self.weather = weather;
         self
@@ -102,6 +104,7 @@ impl WindWakerShaderBuilder {
 
     /// Overrides the highlight color with the given color. Highlights are the parts of the model that are facing the light source and are not in shadow.
     /// This overrides both the [time of day](WindWakerShaderBuilder::time_of_day) and [weather](WindWakerShaderBuilder::weather) settings.
+    #[must_use]
     pub const fn override_highlight_color(mut self, color: Color) -> Self {
         self.override_highlight_color = Some(color);
         self
@@ -109,6 +112,7 @@ impl WindWakerShaderBuilder {
 
     /// Overrides the shadow color with the given color. Shadows are the parts of the model that are not facing the light source.
     /// This overrides both the [time of day](WindWakerShaderBuilder::time_of_day) and [weather](WindWakerShaderBuilder::weather) settings.
+    #[must_use]
     pub const fn override_shadow_color(mut self, color: Color) -> Self {
         self.override_shadow_color = Some(color);
         self
@@ -116,6 +120,7 @@ impl WindWakerShaderBuilder {
 
     /// Overrides the rim color with the given color. The rim is the edge of the model, which gets a slight specular highlight to make the model pop.
     /// This overrides both the [time of day](WindWakerShaderBuilder::time_of_day) and [weather](WindWakerShaderBuilder::weather) settings.
+    #[must_use]
     pub const fn override_rim_color(mut self, color: Color) -> Self {
         self.override_rim_color = Some(color);
         self
@@ -171,6 +176,7 @@ pub enum TimeOfDay {
 
 impl TimeOfDay {
     /// Returns the next time of day in the cycle.
+    #[must_use]
     pub const fn next(self) -> Self {
         match self {
             Self::Dusk => Self::Morning,

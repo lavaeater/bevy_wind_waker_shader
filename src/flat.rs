@@ -127,17 +127,20 @@ impl FlatShaderBuilder {
     ///
     /// This is a convenience wrapper around [`shadow_tint`](Self::shadow_tint) using a
     /// neutral gray at the given brightness.
+    #[must_use]
     pub const fn shadow_darkness(self, brightness: f32) -> Self {
         self.shadow_tint(Color::srgb(brightness, brightness, brightness))
     }
 
     /// Sets an explicit color to multiply onto shadowed areas.
+    #[must_use]
     pub const fn shadow_tint(mut self, color: Color) -> Self {
         self.shadow_tint = color;
         self
     }
 
     /// Sets the color multiplied onto lit areas. Defaults to white (original color unchanged).
+    #[must_use]
     pub const fn highlight_tint(mut self, color: Color) -> Self {
         self.highlight_tint = color;
         self
@@ -147,6 +150,7 @@ impl FlatShaderBuilder {
     ///
     /// `0.0` disables posterization. `6.0` (default) gives a 216-color palette. Higher values
     /// are subtler; lower values give a more extreme poster-art look.
+    #[must_use]
     pub const fn color_levels(mut self, levels: f32) -> Self {
         self.color_levels = levels;
         self

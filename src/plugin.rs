@@ -29,6 +29,10 @@ impl Plugin for WindWakerShaderPlugin {
         let is_srgb = false;
         let sampler = ImageSampler::default();
         let render_asset_usages = RenderAssetUsages::RENDER_WORLD;
+        #[expect(
+            clippy::expect_used,
+            reason = "the PNG is embedded at compile time, so decoding either always succeeds or always fails; a failure is a broken build, not a runtime condition"
+        )]
         let img = Image::from_buffer(
             buffer,
             extension,
@@ -40,11 +44,9 @@ impl Plugin for WindWakerShaderPlugin {
         // Safety: This is a known valid image. If this fails, the plugin fundamentally cannot function.
         .expect("Failed to load internal image.");
 
-        app.world_mut()
+        let _ = app.world_mut()
             .resource_mut::<Assets<Image>>()
-            .insert(TEXTURE_HANDLE.id(), img)
-            // Safety: will never error for UUID handles
-            .unwrap();
+            .insert(TEXTURE_HANDLE.id(), img);
 
         app.add_plugins(MaterialPlugin::<crate::ExtendedMaterial>::default())
             .add_systems(
