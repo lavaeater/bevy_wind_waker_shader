@@ -224,11 +224,10 @@ impl Plugin for FlatShaderPlugin {
             RenderAssetUsages::RENDER_WORLD,
         )
         .expect("Failed to load internal image.");
-
-        app.world_mut()
+        
+        let _ = app.world_mut()
             .resource_mut::<Assets<Image>>()
-            .insert(TEXTURE_HANDLE.id(), img)
-            .unwrap();
+            .insert(TEXTURE_HANDLE.id(), img);
 
         app.add_plugins(MaterialPlugin::<FlatExtendedMaterial>::default())
             .add_systems(
