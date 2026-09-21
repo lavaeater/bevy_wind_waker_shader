@@ -4,9 +4,9 @@ use bevy::prelude::*;
 use bevy::render::render_resource::AsBindGroup;
 use bevy::shader::ShaderRef;
 
-pub(crate) const SHADER_HANDLE: Handle<Shader> =
+pub const SHADER_HANDLE: Handle<Shader> =
     uuid_handle!("ddeed264-efde-495e-9159-4ac3db07f9f8");
-pub(crate) const TEXTURE_HANDLE: Handle<Image> =
+pub const TEXTURE_HANDLE: Handle<Image> =
     uuid_handle!("1af26f3e-5605-4723-a036-dc83f357c7d8");
 
 /// The type of the material that will be inserted for you after you insert the [`WindWakerShader`] via the [`WindWakerShaderBuilder`] into an entity.
@@ -50,6 +50,7 @@ impl MaterialExtension for WindWakerShader {
 }
 
 /// Builds a new [`WindWakerShader`] by setting the parameters to look like those in The Legend of Zelda: The Wind Waker.
+///
 /// After insertion, the shader will be moved into the [`ExtendedMaterial`] of the entity.
 /// If the entity in question is a [`Scene`](bevy::prelude::Scene), this is done for all the entities inside the scene.
 ///
@@ -83,7 +84,7 @@ impl WindWakerShaderBuilder {
     /// Note that the [weather](WindWakerShaderBuilder::weather) will modify the colors.
     ///
     /// The default time of day is [TimeOfDay::Day].
-    pub fn time_of_day(mut self, time: TimeOfDay) -> Self {
+    pub const fn time_of_day(mut self, time: TimeOfDay) -> Self {
         self.time_of_day = time;
         self
     }
@@ -91,28 +92,28 @@ impl WindWakerShaderBuilder {
     /// Modifies the color palette associated with the [time of day](WindWakerShaderBuilder::time_of_day) by the given weather.
     ///
     /// The default weather is [Weather::Sunny].
-    pub fn weather(mut self, weather: Weather) -> Self {
+    pub const fn weather(mut self, weather: Weather) -> Self {
         self.weather = weather;
         self
     }
 
     /// Overrides the highlight color with the given color. Highlights are the parts of the model that are facing the light source and are not in shadow.
     /// This overrides both the [time of day](WindWakerShaderBuilder::time_of_day) and [weather](WindWakerShaderBuilder::weather) settings.
-    pub fn override_highlight_color(mut self, color: Color) -> Self {
+    pub const fn override_highlight_color(mut self, color: Color) -> Self {
         self.override_highlight_color = Some(color);
         self
     }
 
     /// Overrides the shadow color with the given color. Shadows are the parts of the model that are not facing the light source.
     /// This overrides both the [time of day](WindWakerShaderBuilder::time_of_day) and [weather](WindWakerShaderBuilder::weather) settings.
-    pub fn override_shadow_color(mut self, color: Color) -> Self {
+    pub const fn override_shadow_color(mut self, color: Color) -> Self {
         self.override_shadow_color = Some(color);
         self
     }
 
     /// Overrides the rim color with the given color. The rim is the edge of the model, which gets a slight specular highlight to make the model pop.
     /// This overrides both the [time of day](WindWakerShaderBuilder::time_of_day) and [weather](WindWakerShaderBuilder::weather) settings.
-    pub fn override_rim_color(mut self, color: Color) -> Self {
+    pub const fn override_rim_color(mut self, color: Color) -> Self {
         self.override_rim_color = Some(color);
         self
     }
@@ -150,6 +151,7 @@ impl WindWakerShaderBuilder {
 }
 
 /// The time of day used for the color palette in the [`WindWakerShaderBuilder`].
+///
 /// Note that this does not have to correspond to any actual time settings in your game.
 /// Rather, think of this as "mood categories" that you can use to set the color palette.
 #[derive(Debug, Clone, Copy, Default)]
@@ -166,19 +168,20 @@ pub enum TimeOfDay {
 
 impl TimeOfDay {
     /// Returns the next time of day in the cycle.
-    pub fn next(self) -> Self {
+    pub const fn next(self) -> Self {
         match self {
-            TimeOfDay::Dusk => TimeOfDay::Morning,
-            TimeOfDay::Morning => TimeOfDay::Day,
-            TimeOfDay::Day => TimeOfDay::Afternoon,
-            TimeOfDay::Afternoon => TimeOfDay::Evening,
-            TimeOfDay::Evening => TimeOfDay::Night,
-            TimeOfDay::Night => TimeOfDay::Dusk,
+            Self::Dusk => Self::Morning,
+            Self::Morning => Self::Day,
+            Self::Day => Self::Afternoon,
+            Self::Afternoon => Self::Evening,
+            Self::Evening => Self::Night,
+            Self::Night => Self::Dusk,
         }
     }
 }
 
 /// The weather used for the color palette in the [`WindWakerShaderBuilder`].
+///
 /// Note that this does not have to correspond to any actual weather settings in your game.
 /// Rather, think of this as "mood categories" that you can use to set the color palette.
 #[derive(Debug, Clone, Copy, Default)]

@@ -5,7 +5,7 @@ use bevy::prelude::{Commands, Entity, Query, Res, ResMut, WorldInstanceSpawner, 
 use bevy::world_serialization::{WorldInstance, WorldAssetRoot};
 
 /// Source: https://github.com/bevyengine/bevy/discussions/8533#discussioncomment-5787519
-pub(crate) fn customize_scene_materials(
+pub fn customize_scene_materials(
     unloaded_instances: Query<(Entity, Option<&WorldInstance>, &WindWakerShader), With<WorldAssetRoot>>,
     handles: Query<(Entity, &MeshMaterial3d<StandardMaterial>)>,
     pbr_materials: Res<Assets<StandardMaterial>>,
@@ -36,7 +36,7 @@ pub(crate) fn customize_scene_materials(
     }
 }
 
-pub(crate) fn customize_standard_materials(
+pub fn customize_standard_materials(
     with_material: Query<
         (Entity, &MeshMaterial3d<StandardMaterial>, &WindWakerShader),
         Without<WorldAssetRoot>,

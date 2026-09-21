@@ -97,7 +97,7 @@ impl PixelShaderBuilder {
     /// Sets the UV grid density. Lower values produce larger pixel blocks.
     ///
     /// `8.0` gives a very coarse look; `32.0` is subtle. `0.0` disables UV snapping.
-    pub fn pixel_density(mut self, density: f32) -> Self {
+    pub const fn pixel_density(mut self, density: f32) -> Self {
         self.pixel_density = density;
         self
     }
@@ -105,13 +105,13 @@ impl PixelShaderBuilder {
     /// Sets the number of discrete color levels per RGB channel.
     ///
     /// `4.0` gives a harsh poster-art look; `16.0` is subtle. `0.0` disables posterization.
-    pub fn color_levels(mut self, levels: f32) -> Self {
+    pub const fn color_levels(mut self, levels: f32) -> Self {
         self.color_levels = levels;
         self
     }
 
     /// Builds the [`PixelShader`].
-    pub fn build(self) -> PixelShader {
+    pub const fn build(self) -> PixelShader {
         PixelShader {
             pixel_density: self.pixel_density,
             color_levels: self.color_levels,
