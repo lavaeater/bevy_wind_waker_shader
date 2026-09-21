@@ -211,6 +211,10 @@ impl Plugin for FlatShaderPlugin {
 
         // Load ZAtoon texture. If WindWakerShaderPlugin is also registered, both plugins
         // insert the same image under the same UUID handle, which is idempotent.
+        #[expect(
+            clippy::expect_used,
+            reason = "the PNG is embedded at compile time, so decoding either always succeeds or always fails; a failure is a broken build, not a runtime condition"
+        )]
         let img = Image::from_buffer(
             include_bytes!("assets/ZAtoon.png"),
             ImageType::Extension("png"),
