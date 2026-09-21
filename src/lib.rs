@@ -3,7 +3,9 @@
 #![doc = include_str!("../readme.md")]
 #![recursion_limit = "256"]
 pub mod prelude {
-    //! Everything you need to get started. See [`WindWakerShaderBuilder`] for Wind Waker style,
+    //! Everything you need to get started.
+    //! 
+    //!  See [`WindWakerShaderBuilder`] for Wind Waker style,
     //! [`FlatShaderPlugin`] / [`FlatShaderBuilder`] for flat Sable-style shading, and
     //! [`PixelShaderPlugin`] / [`PixelShaderBuilder`] for pixelation.
     pub use crate::{
