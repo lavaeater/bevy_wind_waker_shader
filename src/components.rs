@@ -1,13 +1,11 @@
-use bevy::asset::{uuid_handle, Asset, Handle};
+use bevy::asset::{Asset, Handle, uuid_handle};
 use bevy::pbr::{MaterialExtension, StandardMaterial};
 use bevy::prelude::*;
 use bevy::render::render_resource::AsBindGroup;
 use bevy::shader::ShaderRef;
 
-pub const SHADER_HANDLE: Handle<Shader> =
-    uuid_handle!("ddeed264-efde-495e-9159-4ac3db07f9f8");
-pub const TEXTURE_HANDLE: Handle<Image> =
-    uuid_handle!("1af26f3e-5605-4723-a036-dc83f357c7d8");
+pub const SHADER_HANDLE: Handle<Shader> = uuid_handle!("ddeed264-efde-495e-9159-4ac3db07f9f8");
+pub const TEXTURE_HANDLE: Handle<Image> = uuid_handle!("1af26f3e-5605-4723-a036-dc83f357c7d8");
 
 /// The type of the material that will be inserted for you after you insert the [`WindWakerShader`] via the [`WindWakerShaderBuilder`] into an entity.
 pub type ExtendedMaterial = bevy::pbr::ExtendedMaterial<StandardMaterial, WindWakerShader>;
@@ -79,6 +77,11 @@ pub struct WindWakerShaderBuilder {
     override_rim_color: Option<Color>,
 }
 
+/// Palette entry helper: the hex digits of the original Wind Waker colors, as a [`Color`].
+fn rgb(r: u8, g: u8, b: u8) -> Color {
+    Srgba::rgb_u8(r, g, b).into()
+}
+
 impl WindWakerShaderBuilder {
     /// Uses the color palette associated with the given time of day in The Legend of Zelda: The Wind Waker.
     /// Note that the [weather](WindWakerShaderBuilder::weather) will modify the colors.
@@ -120,26 +123,26 @@ impl WindWakerShaderBuilder {
 
     /// Builds the [`WindWakerShader`] with the given settings. Note that after insertion, the shader will be moved into the [`ExtendedMaterial`] of the entity.
     pub fn build(self) -> WindWakerShader {
-        let (highlight_hex, shadow_hex) = match (self.time_of_day, self.weather) {
-            (TimeOfDay::Dusk, Weather::Sunny) => ("A19AA3", "746676"),
-            (TimeOfDay::Dusk, Weather::Rainy) => ("90887A", "746676"),
-            (TimeOfDay::Morning, Weather::Sunny) => ("F0EAE3", "BCB7CB"),
-            (TimeOfDay::Morning, Weather::Rainy) => ("B8BDB8", "9AA494"),
-            (TimeOfDay::Day, Weather::Sunny) => ("FFFFFF", "A39892"),
-            (TimeOfDay::Day, Weather::Rainy) => ("ADBBB7", "8E978D"),
-            (TimeOfDay::Afternoon, Weather::Sunny) => ("D8C37F", "B09070"),
-            (TimeOfDay::Afternoon, Weather::Rainy) => ("999187", "888177"),
-            (TimeOfDay::Evening, Weather::Sunny) => ("8D8C9A", "7E7885"),
-            (TimeOfDay::Evening, Weather::Rainy) => ("8E877D", "7A7368"),
-            (TimeOfDay::Night, Weather::Sunny) => ("879EB5", "5D6E99"),
-            (TimeOfDay::Night, Weather::Rainy) => ("4B6690", "4C595A"),
+        let (highlight, shadow) = match (self.time_of_day, self.weather) {
+            (TimeOfDay::Dusk, Weather::Sunny) => (rgb(0xA1, 0x9A, 0xA3), rgb(0x74, 0x66, 0x76)),
+            (TimeOfDay::Dusk, Weather::Rainy) => (rgb(0x90, 0x88, 0x7A), rgb(0x74, 0x66, 0x76)),
+            (TimeOfDay::Morning, Weather::Sunny) => (rgb(0xF0, 0xEA, 0xE3), rgb(0xBC, 0xB7, 0xCB)),
+            (TimeOfDay::Morning, Weather::Rainy) => (rgb(0xB8, 0xBD, 0xB8), rgb(0x9A, 0xA4, 0x94)),
+            (TimeOfDay::Day, Weather::Sunny) => (rgb(0xFF, 0xFF, 0xFF), rgb(0xA3, 0x98, 0x92)),
+            (TimeOfDay::Day, Weather::Rainy) => (rgb(0xAD, 0xBB, 0xB7), rgb(0x8E, 0x97, 0x8D)),
+            (TimeOfDay::Afternoon, Weather::Sunny) => {
+                (rgb(0xD8, 0xC3, 0x7F), rgb(0xB0, 0x90, 0x70))
+            }
+            (TimeOfDay::Afternoon, Weather::Rainy) => {
+                (rgb(0x99, 0x91, 0x87), rgb(0x88, 0x81, 0x77))
+            }
+            (TimeOfDay::Evening, Weather::Sunny) => (rgb(0x8D, 0x8C, 0x9A), rgb(0x7E, 0x78, 0x85)),
+            (TimeOfDay::Evening, Weather::Rainy) => (rgb(0x8E, 0x87, 0x7D), rgb(0x7A, 0x73, 0x68)),
+            (TimeOfDay::Night, Weather::Sunny) => (rgb(0x87, 0x9E, 0xB5), rgb(0x5D, 0x6E, 0x99)),
+            (TimeOfDay::Night, Weather::Rainy) => (rgb(0x4B, 0x66, 0x90), rgb(0x4C, 0x59, 0x5A)),
         };
-        let highlight_color = self
-            .override_highlight_color
-            .unwrap_or_else(|| Srgba::hex(highlight_hex).unwrap().into());
-        let shadow_color = self
-            .override_shadow_color
-            .unwrap_or_else(|| Srgba::hex(shadow_hex).unwrap().into());
+        let highlight_color = self.override_highlight_color.unwrap_or(highlight);
+        let shadow_color = self.override_shadow_color.unwrap_or(shadow);
         let rim_color = self.override_rim_color.unwrap_or(Color::WHITE);
         WindWakerShader {
             mask: TEXTURE_HANDLE.clone(),
