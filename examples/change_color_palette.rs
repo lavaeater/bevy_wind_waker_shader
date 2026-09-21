@@ -65,7 +65,8 @@ fn change_color(
 
     *time_of_day = time_of_day.next();
     for handle in models.iter() {
-        let mut material = materials.get_mut(handle).unwrap();
+        let Some(mut material) = materials.get_mut(handle) else { return };
+
         material.extension = WindWakerShaderBuilder::default()
             .time_of_day(*time_of_day)
             .build();
