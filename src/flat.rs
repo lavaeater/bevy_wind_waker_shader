@@ -40,8 +40,8 @@ use bevy::pbr::{
 };
 use bevy::prelude::*;
 use bevy::render::render_resource::AsBindGroup;
-use bevy::world_serialization::{WorldInstance, WorldAssetRoot};
 use bevy::shader::ShaderRef;
+use bevy::world_serialization::{WorldAssetRoot, WorldInstance};
 
 use crate::components::TEXTURE_HANDLE;
 
@@ -228,8 +228,9 @@ impl Plugin for FlatShaderPlugin {
             RenderAssetUsages::RENDER_WORLD,
         )
         .expect("Failed to load internal image.");
-        
-        let _ = app.world_mut()
+
+        let _ = app
+            .world_mut()
             .resource_mut::<Assets<Image>>()
             .insert(TEXTURE_HANDLE.id(), img);
 

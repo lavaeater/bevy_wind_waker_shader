@@ -23,8 +23,8 @@ use bevy::pbr::{
 };
 use bevy::prelude::*;
 use bevy::render::render_resource::AsBindGroup;
-use bevy::world_serialization::{WorldInstance, WorldAssetRoot};
 use bevy::shader::ShaderRef;
+use bevy::world_serialization::{WorldAssetRoot, WorldInstance};
 
 pub(crate) const PIXELATE_SHADER_HANDLE: Handle<Shader> =
     uuid_handle!("3a1f7b2c-4d6e-5f8a-9b0c-1d2e3f4a5b6c");

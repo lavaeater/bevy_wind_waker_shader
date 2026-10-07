@@ -5,7 +5,9 @@
 ///   cargo run --example flat_scene
 use bevy::anti_alias::fxaa::Fxaa;
 use bevy::prelude::*;
-use bevy_mod_outline::{AsyncWorldInheritOutline, AutoGenerateOutlineNormalsPlugin, OutlinePlugin, OutlineVolume};
+use bevy_mod_outline::{
+    AsyncWorldInheritOutline, AutoGenerateOutlineNormalsPlugin, OutlinePlugin, OutlineVolume,
+};
 use bevy_wind_waker_shader::prelude::*;
 
 fn main() {
