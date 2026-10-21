@@ -76,6 +76,16 @@ pub struct FlatShader {
     /// reminiscent of Sable's art style. Higher values (e.g. `16.0`) are subtler.
     #[uniform(104)]
     pub color_levels: f32,
+    /// Light level at which a surface counts as fully lit. Below it the surface darkens
+    /// toward black in a few hard bands, so an unlit area at night is actually dark rather
+    /// than sitting at `shadow_tint`. `0.0` disables it (the classic look, where nothing is
+    /// ever darker than the shadow tint).
+    #[uniform(105)]
+    pub dark_level: f32,
+    /// How much the lights' own colour tints the surface: `0.0` ignores it (only the
+    /// brightness counts), `1.0` takes the full hue, so a green lamp casts green.
+    #[uniform(106)]
+    pub light_tint: f32,
 }
 
 impl Default for FlatShader {
@@ -110,6 +120,8 @@ pub struct FlatShaderBuilder {
     shadow_tint: Color,
     highlight_tint: Color,
     color_levels: f32,
+    dark_level: f32,
+    light_tint: f32,
 }
 
 impl Default for FlatShaderBuilder {
@@ -118,6 +130,8 @@ impl Default for FlatShaderBuilder {
             shadow_tint: Color::srgb(0.5, 0.5, 0.5),
             highlight_tint: Color::WHITE,
             color_levels: 16.0,
+            dark_level: 0.0,
+            light_tint: 0.0,
         }
     }
 }
@@ -156,6 +170,23 @@ impl FlatShaderBuilder {
         self
     }
 
+    /// Lets unlit areas fall to black: below this light level the surface darkens in
+    /// bands. Meant for scenes lit by point and spot lights with little or no ambient.
+    /// `0.0` (default) keeps the classic floor at the shadow tint.
+    #[must_use]
+    pub const fn dark_level(mut self, level: f32) -> Self {
+        self.dark_level = level;
+        self
+    }
+
+    /// How strongly coloured lights tint what they hit, `0.0` (default, brightness only)
+    /// to `1.0` (the light's full hue).
+    #[must_use]
+    pub const fn light_tint(mut self, amount: f32) -> Self {
+        self.light_tint = amount;
+        self
+    }
+
     /// Builds the [`FlatShader`].
     pub fn build(self) -> FlatShader {
         FlatShader {
@@ -163,6 +194,8 @@ impl FlatShaderBuilder {
             shadow_tint: self.shadow_tint.into(),
             highlight_tint: self.highlight_tint.into(),
             color_levels: self.color_levels,
+            dark_level: self.dark_level,
+            light_tint: self.light_tint,
         }
     }
 }

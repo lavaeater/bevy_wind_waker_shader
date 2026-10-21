@@ -24,6 +24,10 @@
 /// Number of discrete color levels per channel for palette quantization.
 /// 0.0 = disabled (continuous color), 6.0 = 216-color palette, 8.0 = 512-color palette, etc.
 @group(3) @binding(104) var<uniform> color_levels: f32;
+/// Light level counted as fully lit; below it the surface darkens in bands. 0.0 = off.
+@group(3) @binding(105) var<uniform> dark_level: f32;
+/// How much the light's own colour tints the surface. 0.0 = brightness only.
+@group(3) @binding(106) var<uniform> light_tint: f32;
 
 @fragment
 fn fragment(
@@ -43,13 +47,22 @@ fn fragment(
     var out: FragmentOutput;
     out.color = apply_pbr_lighting(pbr_input);
 
+    // The brightest channel is the light level, so a blue or red light bands like a
+    // white one of the same strength.
+    let light = out.color.rgb;
+    let level = max(light.r, max(light.g, light.b));
+
     // Sample ZAtoon mask at the lighting intensity to get toon quantization.
-    let uv = vec2<f32>(out.color.r, 0.0);
+    let uv = vec2<f32>(level, 0.0);
     let quantization = textureSample(mask, mask_sampler, uv);
 
     // Key difference from Wind Waker: multiply tint against the original texture
     // rather than replacing it, so model colors are fully preserved.
-    let tint = mix(shadow_tint, highlight_tint, quantization);
+    var tint = mix(shadow_tint, highlight_tint, quantization);
+    if light_tint > 0.0 {
+        let hue = light / max(level, 0.0001);
+        tint = vec4<f32>(tint.rgb * mix(vec3<f32>(1.0), hue, light_tint), tint.a);
+    }
     out.color = texture * tint;
 
     // Palette quantization: posterize each RGB channel to `color_levels` discrete steps.
@@ -59,6 +72,16 @@ fn fragment(
             round(out.color.rgb * color_levels) / color_levels,
             out.color.a,
         );
+    }
+
+    // After the posterizing, which would otherwise round the dim bands' weakest channels
+    // to zero and turn a warm lamp's edge red.
+    if dark_level > 0.0 {
+        // Three hard steps down to black, rounded so the faint spill at a light's range
+        // limit drops out instead of lighting a whole band.
+        let reach = clamp(level / dark_level, 0.0, 1.0);
+        let banded = floor(reach * 3.0 + 0.5) / 3.0;
+        out.color = vec4<f32>(out.color.rgb * banded, out.color.a);
     }
 
     pbr_input.material.base_color = texture;
