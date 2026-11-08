@@ -242,8 +242,8 @@ impl Plugin for FlatShaderPlugin {
         load_internal_asset!(
             app,
             FLAT_SHADER_HANDLE,
-            "assets/flat_shader.wgsl",
-            Shader::from_wgsl
+            "assets/flat_shader.wesl",
+            Shader::from_wesl
         );
 
         // Load ZAtoon texture. If WindWakerShaderPlugin is also registered, both plugins
@@ -298,7 +298,9 @@ fn customize_scene_materials(
         if scene_manager.instance_is_ready(**instance) {
             cmds.entity(entity).remove::<FlatShader>();
         }
-        let handles = handles.iter_many(scene_manager.iter_instance_entities(**instance));
+        let handles = handles
+            .iter_many(scene_manager.iter_instance_entities(**instance))
+            .flatten();
         for (entity, material_handle) in handles {
             let Some(material) = pbr_materials.get(material_handle) else {
                 continue;
@@ -341,7 +343,7 @@ fn customize_standard_materials(
 /// receives a `MeshMaterial3d<StandardMaterial>` and inserts the default
 /// [`FlatShader`] so the swap systems pick it up next `PreUpdate`.
 fn apply_globally_on_material_add(
-    trigger: On<Add, MeshMaterial3d<StandardMaterial>>,
+    trigger: On<Add<MeshMaterial3d<StandardMaterial>>>,
     without_shader: Query<(), Without<FlatShader>>,
     global: Res<GlobalFlatShader>,
     mut cmds: Commands,

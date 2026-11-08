@@ -47,23 +47,23 @@ The shader extends Bevy's PBR pipeline via `MaterialExtension`. Users insert a `
 
 ### Embedded assets
 
-Both `src/assets/toon_shader.wgsl` (WGSL fragment shader) and `src/assets/ZAtoon.png` (1D toon mask texture) are embedded in the binary via `load_internal_asset!` / `include_bytes!` and referenced by stable UUID handles defined in `components.rs`. No runtime asset loading is required.
+Both `src/assets/toon_shader.wesl` (WESL fragment shader) and `src/assets/ZAtoon.png` (1D toon mask texture) are embedded in the binary via `load_internal_asset!` / `include_bytes!` and referenced by stable UUID handles defined in `components.rs`. No runtime asset loading is required.
 
-### Bevy 0.18 observer API
+### Bevy 0.20 observer API
 
-Observers use `On<E, B>` (not `Trigger`) as the first param, `Add` (not `OnAdd`) for component-add hooks, and `trigger.event_target()` (not `trigger.target()`) to get the entity.
+Observers take `On<E>` as the first param; component hooks name the component inside the event, `On<Add<T>>` (0.19 had `On<Add, T>`); `trigger.event_target()` gets the entity. Queries' `iter_many` yields `Result`s (`.flatten()` skips the misses).
 
-### WGSL shader overview
+### Shader overview
 
-The Wind Waker fragment shader (`toon_shader.wgsl`):
+The Wind Waker fragment shader (`toon_shader.wesl`):
 1. Computes standard PBR lighting to get a raw intensity.
 2. Samples the ZAtoon 1D mask texture using the red channel as U coordinate to quantize lighting into toon bands.
 3. Mixes `shadow_color` and `highlight_color` based on the quantized result.
 4. Adds a rim highlight (quartic falloff) using `rim_color`.
 5. Multiplies by the original base texture color, then applies Bevy's post-lighting processing (fog, tonemapping).
 
-The flat shader (`flat_shader.wgsl`) is identical up to step 3, but in step 4 it mixes `shadow_tint`/`highlight_tint` multipliers and applies them *onto* the texture color rather than replacing it. No rim highlight.
+The flat shader (`flat_shader.wesl`) is identical up to step 3, but in step 4 it mixes `shadow_tint`/`highlight_tint` multipliers and applies them *onto* the texture color rather than replacing it. No rim highlight.
 
 ## Compatibility
 
-This crate tracks Bevy versions 1:1. The current version targets **Bevy 0.18** and uses the Bevy 2024 edition. When upgrading Bevy versions, check `MaterialExtension`, `ExtendedMaterial`, `load_internal_asset!`, and `uuid_handle!` APIs — these have changed across releases.
+This crate tracks Bevy versions 1:1. The current version targets **Bevy 0.20** and uses the Bevy 2024 edition. Its shaders are WESL (`.wesl`, `import ...;`, `@if(..)`, `@group(constants::MATERIAL_BIND_GROUP)`), loaded with `Shader::from_wesl`. When upgrading Bevy versions, check `MaterialExtension`, `ExtendedMaterial`, `load_internal_asset!`, and `uuid_handle!` APIs — these have changed across releases.

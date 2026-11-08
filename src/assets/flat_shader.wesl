@@ -1,33 +1,32 @@
-#import bevy_pbr::{
+import bevy_pbr::render::{
     pbr_fragment::pbr_input_from_standard_material,
     pbr_functions::alpha_discard,
-}
+};
 
-#ifdef PREPASS_PIPELINE
-#import bevy_pbr::{
-    prepass_io::{VertexOutput, FragmentOutput},
-    pbr_deferred_functions::deferred_output,
-}
-#else
-#import bevy_pbr::{
+@if(PREPASS_PIPELINE)
+import bevy_pbr::{
+    prepass::io::{VertexOutput, FragmentOutput},
+    deferred::functions::deferred_output,
+};
+@else
+import bevy_pbr::render::{
     forward_io::{VertexOutput, FragmentOutput},
     pbr_functions::{apply_pbr_lighting, main_pass_post_lighting_processing},
-}
-#endif
+};
 
-@group(3) @binding(100) var mask: texture_2d<f32>;
-@group(3) @binding(101) var mask_sampler: sampler;
+@group(constants::MATERIAL_BIND_GROUP) @binding(100) var mask: texture_2d<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(101) var mask_sampler: sampler;
 /// Multiplier applied to shadowed areas (e.g. dark gray = subtle shadow).
-@group(3) @binding(102) var<uniform> shadow_tint: vec4<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(102) var<uniform> shadow_tint: vec4<f32>;
 /// Multiplier applied to lit areas (white = preserve original color).
-@group(3) @binding(103) var<uniform> highlight_tint: vec4<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(103) var<uniform> highlight_tint: vec4<f32>;
 /// Number of discrete color levels per channel for palette quantization.
 /// 0.0 = disabled (continuous color), 6.0 = 216-color palette, 8.0 = 512-color palette, etc.
-@group(3) @binding(104) var<uniform> color_levels: f32;
+@group(constants::MATERIAL_BIND_GROUP) @binding(104) var<uniform> color_levels: f32;
 /// Light level counted as fully lit; below it the surface darkens in bands. 0.0 = off.
-@group(3) @binding(105) var<uniform> dark_level: f32;
+@group(constants::MATERIAL_BIND_GROUP) @binding(105) var<uniform> dark_level: f32;
 /// How much the light's own colour tints the surface. 0.0 = brightness only.
-@group(3) @binding(106) var<uniform> light_tint: f32;
+@group(constants::MATERIAL_BIND_GROUP) @binding(106) var<uniform> light_tint: f32;
 
 @fragment
 fn fragment(
@@ -35,11 +34,17 @@ fn fragment(
     @builtin(front_facing) is_front: bool,
 ) -> FragmentOutput {
     var pbr_input = pbr_input_from_standard_material(in, is_front);
-    pbr_input.material.base_color = alpha_discard(pbr_input.material, pbr_input.material.base_color);
+    pbr_input.material.base_color = alpha_discard(
+        pbr_input.material.flags,
+        pbr_input.material.alpha_cutoff,
+        pbr_input.material.base_color
+    );
 
-#ifdef PREPASS_PIPELINE
-    let out = deferred_output(in, pbr_input);
-#else
+@if(PREPASS_PIPELINE) {
+    return deferred_output(in, pbr_input);
+}
+
+@if(!PREPASS_PIPELINE) {
     // Preserve texture; run PBR with white base to get a pure lighting value.
     let texture = pbr_input.material.base_color;
     pbr_input.material.base_color = vec4<f32>(1.0, 1.0, 1.0, 1.0);
@@ -86,7 +91,6 @@ fn fragment(
 
     pbr_input.material.base_color = texture;
     out.color = main_pass_post_lighting_processing(pbr_input, out.color);
-#endif
-
     return out;
+}
 }

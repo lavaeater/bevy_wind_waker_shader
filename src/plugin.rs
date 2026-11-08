@@ -19,8 +19,8 @@ impl Plugin for WindWakerShaderPlugin {
         load_internal_asset!(
             app,
             SHADER_HANDLE,
-            "assets/toon_shader.wgsl",
-            Shader::from_wgsl
+            "assets/toon_shader.wesl",
+            Shader::from_wesl
         );
 
         let buffer = include_bytes!("assets/ZAtoon.png");

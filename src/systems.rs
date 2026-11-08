@@ -22,7 +22,9 @@ pub fn customize_scene_materials(
                 cmds.entity(entity).remove::<WindWakerShader>();
             }
             // Iterate over all entities in scene (once it's loaded)
-            let handles = handles.iter_many(scene_manager.iter_instance_entities(**instance));
+            let handles = handles
+                .iter_many(scene_manager.iter_instance_entities(**instance))
+                .flatten();
             for (entity, material_handle) in handles {
                 let Some(material) = pbr_materials.get(material_handle) else {
                     continue;

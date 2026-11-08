@@ -138,8 +138,8 @@ impl Plugin for PixelShaderPlugin {
         load_internal_asset!(
             app,
             PIXELATE_SHADER_HANDLE,
-            "assets/pixelate_shader.wgsl",
-            Shader::from_wgsl
+            "assets/pixelate_shader.wesl",
+            Shader::from_wesl
         );
 
         app.add_plugins(MaterialPlugin::<PixelExtendedMaterial>::default())
@@ -168,7 +168,9 @@ fn customize_scene_materials(
         if scene_manager.instance_is_ready(**instance) {
             cmds.entity(entity).remove::<PixelShader>();
         }
-        let handles = handles.iter_many(scene_manager.iter_instance_entities(**instance));
+        let handles = handles
+            .iter_many(scene_manager.iter_instance_entities(**instance))
+            .flatten();
         for (entity, material_handle) in handles {
             let Some(material) = pbr_materials.get(material_handle) else {
                 continue;
